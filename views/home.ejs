@@ -1,0 +1,21 @@
+<% layout("layouts/boilerplate") %>
+    <h1 class="display-3">AniHyo</h1>
+    <div class="d-flex flex-wrap gap-3">
+        <% for(let i=0; i < animes.length; i++){ %>
+            <div class="card" style="width: 18rem;">
+                <% if (animes[i].images && animes[i].images.facebook && animes[i].images.facebook.og_image_url) { %>
+                    <a href="/home/<%= animes[i].id %>">
+                    <img src="<%= animes[i].images.facebook.og_image_url %>" class="card-img-top" alt="キービジュアル">
+                    </a>
+                    <% } else { %>
+                        <img src="https://sesupport.edumall.jp/hc/article_attachments/900009570963/noImage.jpg" class="card-img-top" alt="キービジュアル">
+                        <% } %>
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <%= animes[i].title %>
+                                </h5>
+                            </div>
+                            <a href="#" class="btn btn-primary btn-sm">+マイリスト</a>
+            </div>
+            <% } %>
+    </div>
