@@ -3,6 +3,19 @@ const axios = require("axios");
 const app = express();
 const ejsMate = require("ejs-mate");
 const path = require("path");
+const mongoose = require("mongoose");
+
+// MongoDBへの接続
+mongoose.connect('mongodb://localhost:27017/AniHyo', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+    .then(() => {
+      console.log('MongoDBに接続しました');
+    })
+    .catch((err) => {
+      console.error('MongoDBへの接続に失敗しました', err);
+    });
 
 app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
