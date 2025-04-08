@@ -19,7 +19,9 @@ mongoose.connect('mongodb://localhost:27017/AniHyo', {
       console.error('MongoDBへの接続に失敗しました', err);
     });
 
-const AnnictResSchema = new mongoose.Schema({}, { strict: false });
+//スキーマを定義Annictの作品IDをデータベース上のIDにする
+const AnnictResSchema = new mongoose.Schema({}, { _id: false, strict: false });
+AnnictResSchema.add({ _id: Number }); 
 const AnnictRes = mongoose.model("AnnictRes", AnnictResSchema);
 
 //指定した季節アニメ達をannictから取ってきてdbに保存する
@@ -56,12 +58,15 @@ const ResSaveFunc = async (season) => {
                 );
             }
             console.log("データの保存が完了しました。");
+            process.exit(0);
         } else {
             console.log("データがありません");
+            process.exit(0);
         }
 
     } catch (error) {
         console.error("データ取得エラー:", error);
+        process.exit(1);
     }
 };
 
@@ -76,9 +81,8 @@ const AnnictKonki = async () => {
         // 視聴数が多い順にソート
         filteredWorks.sort((a, b) => b.watchers_count - a.watchers_count);
 
-        return filteredWorks;
-        console.log(filteredWorks);
-        return;
+        return filteredWorks;    
+        
     } catch (error) {
         console.error(error);
         return [];
@@ -86,4 +90,7 @@ const AnnictKonki = async () => {
 }
     
 
+ResSaveFunc("2025-spring");
 
+
+module.exports = {AnnictKonki};
