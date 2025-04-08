@@ -70,19 +70,17 @@ const ResSaveFunc = async (season) => {
     }
 };
 
-const AnnictKonki = async () => {
+//DBからyearseasonに合う季節アニメを持ってきて返す関数
+const AnnictKonki = async (YearSeason) => {
     try {
         // MongoDB から `2025-winter` シーズンのデータを取得
-        const animes = await AnnictRes.find({ season_name: "2025-winter" });
-
+        const animes = await AnnictRes.find({ season_name: `${YearSeason}` });
         // TVアニメのみにフィルタリング
         const filteredWorks = animes.filter(work => work.media === "tv");
-
         // 視聴数が多い順にソート
         filteredWorks.sort((a, b) => b.watchers_count - a.watchers_count);
-
         return filteredWorks;    
-        
+
     } catch (error) {
         console.error(error);
         return [];

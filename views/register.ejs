@@ -1,0 +1,22 @@
+<% layout("layouts/boilerplate") %>
+
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <form class="p-4 border rounded bg-light" style="min-width: 300px;" action="/register" method="POST" class="validated-form" novalidate>
+        <h2 class="text-center mb-4">ユーザー登録</h2>
+            <div class="mb-3">
+                <label for="username" class="form-label">ユーザー名</label>
+                <input type="text" class="form-control" id="username" name="username" autofocus required>
+            </div>
+
+            <div class="mb-3">
+                <label for="email" class="form-label">メールアドレス</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">パスワード</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+
+            <button type="submit" class="btn btn-success w-100">登録する</button>
+        </form>
