@@ -21,8 +21,8 @@ app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-//環境変数
-const AccessToken = "P5O8f0cbBkGCromk1Jma6OvjgEqMQHBFwbxf7gTQzTA"
+//ここに環境変数を入れる
+const AccessToken 
 
 //今期（2025冬）のアニメオブジェクトが入った、配列を返す関数
 const AnnictKonki = async () => {
