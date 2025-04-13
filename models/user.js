@@ -1,14 +1,34 @@
 const mongoose = require('mongoose');
 const passportLocalMongoose = require('passport-local-mongoose');
+const Schema = mongoose.Schema; 
+
+const ReviewSchema = new Schema({
+    episode: Number,
+    comment: String,
+    score: Number
+  });
+
+  const MyListSchema = new Schema({
+    AnnictId: Number,
+    isReviewed: {
+      type: Boolean,
+      default: false
+    },
+    currentAve: Number,
+    previousReviewedEpisode: Number,
+    reviews: [ReviewSchema] // ReviewSchema を要素とする配列
+  });
 
 const UserSchema = new mongoose.Schema({
-    username: String,
-    email: String,
-    password: String,
-    mylist: [{ type: Number }]  // AnnictのアニメIDを想定
+    email: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    mylist: [MyListSchema]
 });
 
-UserSchema.plugin(passportLocalMongoose); // パスワードハッシュなどを自動で処理
+//usernameとhashとsalt等をパスポートが追加してくれる
+UserSchema.plugin(passportLocalMongoose); 
 
-const User = mongoose.model('User', UserSchema);
-module.exports = User;
+module.exports = mongoose.model('User', UserSchema);

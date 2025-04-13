@@ -5,29 +5,15 @@ const ejsMate = require("ejs-mate");
 const path = require("path");
 const mongoose = require("mongoose");
 const bodyParser = require('body-parser');
-
-//passportのログイン機能関連
-const session = require('express-session');
+const session =require("express-session");
+const homeRoutes = require("./routes/home");
+const loginRoutes = require("./routes/login");
+const registerRoutes = require("./routes/register");
+const logoutRoutes = require("./routes/logout");
+const flash = require('connect-flash');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const User = require('./models/user');
-app.use(session({
-    secret: 'your secret phrase',
-    resave: false,
-    saveUninitialized: false
-}));
-app.use(passport.initialize());
-app.use(passport.session());
-passport.use(new LocalStrategy(User.authenticate()));
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
-
-// URLエンコードされたデータを解析するミドルウェアを設定（フォームデータなど）
-app.use(bodyParser.urlencoded({ extended: true }));
-
-// JSON形式のデータを解析するミドルウェアを設定
-app.use(bodyParser.json());
-
 
 // MongoDBへの接続
 mongoose.connect('mongodb://localhost:27017/AniHyo', {
@@ -41,86 +27,51 @@ mongoose.connect('mongodb://localhost:27017/AniHyo', {
         console.error('MongoDBへの接続に失敗しました', err);
     });
 
+//ejs、viewsの設定
 app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-//環境変数
-const AccessToken = "P5O8f0cbBkGCromk1Jma6OvjgEqMQHBFwbxf7gTQzTA"
+//静的ファイルの設定
+app.use(express.static(path.join(__dirname, 'public')));
 
-//今期（2025冬）のアニメオブジェクトが入った、配列を返す関数
-const AnnictKonki = async () => {
-    try {
-        let isNextPage = true;
-        let page = 1;
-        let animes = []
-        while (isNextPage) {
-            const res = await axios.get(`https://api.annict.com/v1/works?access_token=${AccessToken}&filter_season=2025-winter&per_page=40&page=${page}`);
-            //TV放送のもののみにする
-            const filteredWorks = res.data.works.filter(work => {
-                return work.media === "tv";
-            });
-            animes.push(...filteredWorks);
-            isNextPage = res.data.next_page;
-            page++;
-        }
-        //視聴数が多い順にソート
-        animes.sort((a, b) => {
-            return b.watchers_count - a.watchers_count;
-        });
-        return animes;
-    } catch (error) {
-        console.error(error);
-        return [null]
+// URLエンコードされたデータを解析するミドルウェアを設定（フォームデータなど）
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// JSON形式のデータを解析するミドルウェアを設定
+app.use(bodyParser.json());
+
+//セッションとフラッシュの設定
+const sessionConfig = {
+    secret: "mysecret", // ★ 秘密鍵は安全なものに変更してください
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        httpOnly: true,
+        maxAge: 1000 * 60 * 60 * 24 * 7
     }
 };
+app.use(session(sessionConfig));
+app.use(flash());
 
-//workIdをもとにタイトルと画像url取ってきて返す関数
-const workImageFunc = async (workId) => {
-    const res = await axios.get(`https://api.annict.com/v1/works?access_token=${AccessToken}&filter_ids=${workId}`);
-    const imageURL = res.data.works[0].images.facebook.og_image_url;
-    const workTitle = res.data.works[0].title;
-    return [workTitle, imageURL];
-}
+//passporの設定
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
-//ホームページ
-app.get("/home", async (req, res) => {
-    const animes = await AnnictKonki();
-    if (animes) {
-        res.render("home", { animes });
-    } else {
-        res.send("データの取得に失敗");
-    }
+//localsを設定するミドルウェア
+app.use((req, res, next) => {
+    res.locals.currentUser = req.user;
+    next();
 });
 
-//作品詳細ページ
-app.get("/home/:id", async (req, res) => {
-    const workId = req.params.id;
-    const funcResult = await workImageFunc(workId);
-    const workTitle = funcResult[0];
-    const imageURL = funcResult[1];
-    res.render("work", { workTitle, imageURL })
-});
-
-app.get("/register", async(req, res) => {
-    res.render("register")
-});
-
-//ユーザー登録ページ
-app.post('/register', async (req, res) => {
-    console.log(req.body);
-    try {
-        const user = new User({ username: req.body.username, email: req.body.email });
-        const registeredUser = await User.register(user, req.body.password);
-        req.login(registeredUser, err => {
-            if (err) return next(err);
-            res.redirect("/home");
-        });
-    } catch (e) {
-        res.send('登録エラー: ' + e.message);
-    }
-});
-
+//ルーティング
+app.use("/login", loginRoutes);
+app.use("/register", registerRoutes);
+app.use("/logout", logoutRoutes);
+app.use("/home", homeRoutes);
 
 app.listen(3000, () => {
     console.log("ポート3000で受付中");

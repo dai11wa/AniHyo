@@ -15,7 +15,15 @@
                                     <%= animes[i].title %>
                                 </h5>
                             </div>
-                            <a href="#" class="btn btn-primary btn-sm">+マイリスト</a>
+                            <% if(currentUser ) {%>
+                                <% if ( userMylist.includes(animes[i].id) ) {%>
+                                    <button class="btn btn-primary btn-sm mylist-btn" id="<%= animes[i].id %>" disabled>登録済み</button>    
+                                    <% } else {%>
+                                    <button class="btn btn-primary btn-sm mylist-btn" id="<%= animes[i].id %>" >+マイリスト</button>
+                                    <% } %>
+                            <% } %>
             </div>
             <% } %>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="addMylist.js"></script>

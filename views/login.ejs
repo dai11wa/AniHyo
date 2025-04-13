@@ -1,0 +1,17 @@
+<% layout("layouts/boilerplate") %>
+
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <form class="p-4 border rounded bg-light" style="min-width: 300px;" action="/login" method="POST" class="validated-form" novalidate>
+        <h2 class="text-center mb-4">ユーザーログイン</h2>
+            <div class="mb-3">
+                <label for="username" class="form-label">ユーザー名</label>
+                <input type="text" class="form-control" id="username" name="username" autofocus required>
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">パスワード</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+
+            <button type="submit" class="btn btn-success w-100">登録する</button>
+        </form>
