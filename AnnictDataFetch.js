@@ -5,8 +5,6 @@ const app = express();
 const path = require("path");
 
 
-const AccessToken = "P5O8f0cbBkGCromk1Jma6OvjgEqMQHBFwbxf7gTQzTA"
-
 // MongoDBへの接続
 mongoose.connect('mongodb://localhost:27017/AniHyo', {
     useNewUrlParser: true,
