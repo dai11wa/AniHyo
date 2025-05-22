@@ -36,8 +36,13 @@ app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
+<<<<<<< HEAD
 //静的ファイルの設定
 app.use(express.static(path.join(__dirname, 'public')));
+=======
+//ここに環境変数を入れる
+const AccessToken 
+>>>>>>> 2da32be543dbb0de0f52f1496fd32dffae65e2c6
 
 // URLエンコードされたデータを解析するミドルウェアを設定（フォームデータなど）
 app.use(bodyParser.urlencoded({ extended: true }));

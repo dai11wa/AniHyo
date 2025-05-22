@@ -16,11 +16,11 @@
                     <!-- thisAnimeInfo.reviews[i]は1話から1話間隔で順に並んでいる訳ではないので、サブタイトルを付けるために処理をおこなっている -->
                     <% let thisEpisodeInfo = episodes.find((episode) => parseInt(episode.number) === thisAnimeInfo.reviews[i].episode)  %>
                     <%= `${thisEpisodeInfo.number_text} ${thisEpisodeInfo.title}`%>
-
                   </h6>
                   <p class="card-text">
                     <%= thisAnimeInfo.reviews[i].comment %>
                   </p>
+                  <form action=""><button class="submit">削除</button></form>
                 </div>
               </div>
               <% } %>
