@@ -1,5 +1,3 @@
-console.log("aaa");
-
 document.querySelectorAll(".mylist-btn").forEach(btn => {
     btn.addEventListener("click", async () => {
       const workId = btn.id;

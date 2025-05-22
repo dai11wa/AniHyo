@@ -1,3 +1,113 @@
-<!-- 作品詳細ページ -->
-<h1><%= workTitle %></h1>
-<img src="<%= imageURL %>" alt="なんでもないよ">
+<% layout("layouts/boilerplate") %>
+  <div class="container-fluid">
+    <div class="row g-3">
+      <!-- ここから左の行 -->
+      <div class="col-md-6 d-flex flex-column vh-100">
+        <img src="<%= imageURL %>" alt="申し訳ありません画像を用意できませんでした" class="p-4 img-fluid">
+        <!-- ここから過去コメント欄 -->
+        <div class="overflow-auto container flex-grow-1">
+          <h5>過去のコメント</h5>
+          <% if(thisAnimeInfo) {%>
+            <% for(let i=0; i < thisAnimeInfo.reviews.length; i++){%>
+              <div class="card mb-3  " style="width: 95%;">
+                <div class="card-body">
+                  <h5 class="card-title">点数：<%= thisAnimeInfo.reviews[i].score %>点</h5>
+                  <h6 class="card-subtitle mb-2 text-secondary">
+                    <!-- thisAnimeInfo.reviews[i]は1話から1話間隔で順に並んでいる訳ではないので、サブタイトルを付けるために処理をおこなっている -->
+                    <% let thisEpisodeInfo = episodes.find((episode) => parseInt(episode.number) === thisAnimeInfo.reviews[i].episode)  %>
+                    <%= `${thisEpisodeInfo.number_text} ${thisEpisodeInfo.title}`%>
+
+                  </h6>
+                  <p class="card-text">
+                    <%= thisAnimeInfo.reviews[i].comment %>
+                  </p>
+                </div>
+              </div>
+              <% } %>
+                <% } else {%>
+                      <h5>まだ評価がありません。評価を登録する場合はログインしてください。</h5>
+                  <% } %>
+        </div>
+      </div>
+      <!-- ここから右の行 -->
+      <div class="col-md-6 pt-5 vh-100">
+        <h1>
+          <%= workTitle %>
+        </h1>
+        <div class="mt-4">
+          <% if (thisAnimeInfo) { %>
+            <h2 class="">現在の平均点：<%= parseFloat(thisAnimeInfo.currentAve.toFixed(2)) %>点</h2>
+            <% } %>
+        </div>
+        <!-- ここから入力欄 -->
+        <div class="mt-4 p-4 rounded border border-dark">
+          <form action="/home/<%= workId %>/hyoka" method="post">
+            <div class="row g-3">
+              <div class="col-md-5">
+                <select class="form-select form-select-lg" aria-label="評価したい話数を選択" name="episodeNumber">
+                  <% episodes.forEach((episode)=> { %>
+                    <option value="<%= episode.number %>">
+                      <%= `${episode.number_text} ${episode.title}` %>
+                    </option>
+                    <% }); %>
+                </select>
+              </div>
+              <div class="col text-center col-md-7">
+                <label for="score" class="form-label text-dark fs-5" id="displayScore">5点</label>
+                <input type="range" class="form-range w-100" min="0" max="10" step="0.5" id="score" value="5"
+                  name="score" aria-label="スコア入力欄">
+                <script>
+                  const scoreSlider = document.getElementById('score');
+                  const displayScore = document.getElementById('displayScore');
+
+                  scoreSlider.addEventListener('input', function () {
+                    displayScore.textContent = `${scoreSlider.value}点`;
+                  });
+                </script>
+              </div>
+            </div>
+            <div class="mt-4">
+              <label for="comment" class="form-label text-dark">コメント</label>
+              <textarea class="form-control" placeholder="コメント" aria-label="コメント入力欄" rows="8" id="comment"
+                name="comment"></textarea>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <a href="http://twitter.com" id="twitterShareLink" class="text-info">Twitterで共有</a>
+              <button type="submit" class="btn btn-success ms-auto">保存</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ここからツイート共有のためのscript -->
+  <script>
+    //テキストエリアとTwitter共有リンクの要素を取得
+    //テキストエリアとTwitter共有リンクの要素を取得
+    const commentTextArea = document.getElementById('comment');
+    const twitterShareLink = document.getElementById('twitterShareLink');
+
+    // リンクのベースURL（textパラメータを含まない部分）
+    const twitterBaseUrl = "http://twitter.com/share?";
+    const twitterHashtags = "&hashtags=薬屋";
+
+    // 共有したいURLを定義
+    const shareUrl = window.location.href.startsWith('http://localhost') ?
+      'https://your-production-domain.com/some-default-url' : // 本番環境のURLに置き換え
+      window.location.href;
+
+    function updateTwitterShareLink() {
+      const commentText = commentTextArea.value;
+      const encodedCommentText = encodeURIComponent(commentText);
+
+      // URLをツイートの下部に表示させるため、textパラメータの後にurlパラメータを配置
+      const newHref = `${twitterBaseUrl}text=${encodedCommentText}%0A&url=${encodeURIComponent(shareUrl)}%0A${twitterHashtags}`;
+
+      twitterShareLink.href = newHref;
+    }
+
+    commentTextArea.addEventListener('input', updateTwitterShareLink);
+    updateTwitterShareLink();
+  </script>
+  <!-- ここまでツイート共有のためのscript -->
+  </body>

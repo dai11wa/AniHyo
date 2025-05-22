@@ -15,6 +15,10 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const User = require('./models/user');
 
+//環境変数の設定
+require('dotenv').config();
+const AccessToken = process.env.ACCESS_TOKEN;
+
 // MongoDBへの接続
 mongoose.connect('mongodb://localhost:27017/AniHyo', {
     useNewUrlParser: true,
