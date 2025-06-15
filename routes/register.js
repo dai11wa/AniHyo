@@ -8,12 +8,12 @@ router.get("/", async(req, res) => {
 
 //登録ページ
 router.post('/', async (req, res) => {
-    console.log(req.body);
     try {
         const user = new User({ username: req.body.username, email: req.body.email });
         const registeredUser = await User.register(user, req.body.password);
         req.login(registeredUser, err => {
             if (err) return next(err);
+            req.flash("success", "アカウント登録が完了しました")
             res.redirect("/home");
         });
     } catch (e) {

@@ -2,17 +2,40 @@ const axios = require("axios");
 const express = require('express');
 const AnnictRes = require('../models/annictress');
 const { isLoggedIn } = require("../middleware");
+const getCurrentSeason = require("../index");
 const router = express.Router();
 //環境変数の設定
 require('dotenv').config();
 const AccessToken = process.env.ACCESS_TOKEN;
 
-
-
+//現在の年と季節をString型で返す関数（返り値例：2025年冬）
+function getCurrentYearAndSeason( num ) {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1;
+  
+    let season;
+    if (month >= 1 && month <= 3) season = "冬";
+    else if (month >= 4 && month <= 6) season = "春";
+    else if (month >= 7 && month <= 9) season = "夏";
+    else season = "秋";
+    
+    if(num == 0){
+        return `${year}年${season}`;
+    } else {
+        if (season === "冬") season = "winter";
+        else if (month >= 4 && month <= 6) season = "spring";
+        else if (month >= 7 && month <= 9) season = "summer";
+        else season = "autumn";
+        return `${year}-${season}`;
+    }
+  }
+nowSeasonDisplay = getCurrentYearAndSeason(0)
+season_name = getCurrentYearAndSeason(1);
 //ホームページ、マイリストに入っているかどうかもhome.ejsに渡す
 router.get("/", async (req, res) => {
     try {
-        const animes = await AnnictRes.find({ season_name: '2025-winter', media: 'tv' })
+        const animes = await AnnictRes.find({ season_name: season_name , media: 'tv' })
             .lean()
             .sort({ watchers_count: -1 })
             .exec();
@@ -20,7 +43,7 @@ router.get("/", async (req, res) => {
             const userMylist = req.user.mylist.map(item => item.AnnictId);
             return res.render("home", { animes, userMylist });
         }
-        res.render("home", { animes });
+        res.render("home", { animes, nowSeasonDisplay });
     } catch (error) {
         console.error("MongoDBからのデータ取得エラー:", error);
         res.send("申し訳ありませんデータの取得に失敗しました (MongoDB)");
@@ -106,6 +129,37 @@ router.get("/:id", async (req, res) => {
     }
 });
 
+//作品詳細ページのコメント削除ルーティング
+router.delete("/:workId/:reviewId", isLoggedIn, async(req, res) => {
+    const workId = parseInt(req.params.workId);
+    const reviewId = req.params.reviewId;
+
+    try {
+        const mylistItem = req.user.mylist.find(item => item.AnnictId === workId);
+    
+        if (!mylistItem) {
+          return res.status(404).send("作品が見つかりません");
+        }
+    
+        // 該当レビューを削除
+        mylistItem.reviews = mylistItem.reviews.filter(
+          review => review._id.toString() !== reviewId
+        );
+    
+        // currentAve 再計算
+        const total = mylistItem.reviews.reduce((sum, r) => sum + r.score, 0);
+        mylistItem.currentAve = mylistItem.reviews.length > 0
+          ? total / mylistItem.reviews.length
+          : 0;
+    
+        await req.user.save();
+    
+        res.redirect(`/home/${workId}`);
+      } catch (err) {
+        console.error("コメント削除エラー：", err);
+        res.status(500).send("コメント削除に失敗しました");
+      }
+});
 
 //作品idが持つエピソードを入れる関数
 async function searchEpisodes(id) {

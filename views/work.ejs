@@ -1,5 +1,5 @@
 <% layout("layouts/boilerplate") %>
-  <div class="container-fluid">
+  <div>
     <div class="row g-3">
       <!-- ここから左の行 -->
       <div class="col-md-6 d-flex flex-column vh-100">
@@ -20,13 +20,17 @@
                   <p class="card-text">
                     <%= thisAnimeInfo.reviews[i].comment %>
                   </p>
-                  <form action=""><button class="submit">削除</button></form>
+                  <form action="/home/<%= workId %>/<%= thisAnimeInfo.reviews[i]._id %>?_method=DELETE" method="POST">
+                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('このコメントを削除しますか？');">削除</button>
+                  </form>
                 </div>
               </div>
               <% } %>
-                <% } else {%>
-                      <h5>まだ評価がありません。評価を登録する場合はログインしてください。</h5>
-                  <% } %>
+                <% } else if(currentUser){%>
+                      <h5>まだ評価がありません</h5>
+                  <% } else{ %>
+                      <h5>評価をする場合はログインしてください</h5>
+                    <% } %>
         </div>
       </div>
       <!-- ここから右の行 -->
@@ -36,7 +40,7 @@
         </h1>
         <div class="mt-4">
           <% if (thisAnimeInfo) { %>
-            <h2 class="">現在の平均点：<%= parseFloat(thisAnimeInfo.currentAve.toFixed(2)) %>点</h2>
+            <h2>現在の平均点：<%= parseFloat(thisAnimeInfo.currentAve.toFixed(1)) %>点</h2>
             <% } %>
         </div>
         <!-- ここから入力欄 -->
@@ -46,7 +50,7 @@
               <div class="col-md-5">
                 <select class="form-select form-select-lg" aria-label="評価したい話数を選択" name="episodeNumber">
                   <% episodes.forEach((episode)=> { %>
-                    <option value="<%= episode.number %>">
+                    <option value="<%= episode.number %>" <%= thisAnimeInfo ? episode.number === (thisAnimeInfo.previousReviewedEpisode + 1) ? "selected" : "" : "" %>>
                       <%= `${episode.number_text} ${episode.title}` %>
                     </option>
                     <% }); %>
@@ -110,4 +114,3 @@
     updateTwitterShareLink();
   </script>
   <!-- ここまでツイート共有のためのscript -->
-  </body>
