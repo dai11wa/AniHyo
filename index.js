@@ -4,6 +4,7 @@ const app = express();
 const ejsMate = require("ejs-mate");
 const path = require("path");
 const mongoose = require("mongoose");
+const AnnictRes = require('./models/annictress');
 const bodyParser = require('body-parser');
 const session =require("express-session");
 const homeRoutes = require("./routes/home");
@@ -23,9 +24,9 @@ const mongoSanitize = require("express-mongo-sanitize");
 require('dotenv').config();
 const AccessToken = process.env.ACCESS_TOKEN;
 const mysecret = process.env.MYSECRET;
-
+const MONGODB_URI = process.env.MONGODB_URI;
 // MongoDBへの接続
-mongoose.connect('mongodb://localhost:27017/AniHyo', {
+mongoose.connect(MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })
@@ -90,12 +91,12 @@ function getCurrentSeason() {
     return `${year}-${season}`;
   }
   let season = getCurrentSeason();
+  module.exports = season;
 //朝5時にデータベース更新関数を実行
 cron.schedule("0 5 * * *", () => {
-    ResSaveFunc(season)
-    console.log("朝の5時にアニメ情報を更新")
+    ResSaveFunc(season);
+    console.log("朝の5時にアニメ情報を更新");
 });
-
 //----------ここまでアニメ情報のデータベースをアップデートするコード-----------------
 
 //ejs、viewsの設定

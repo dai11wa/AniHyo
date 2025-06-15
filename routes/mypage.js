@@ -14,7 +14,6 @@ router.get("/", isLoggedIn, async (req, res) => {
         if (userMylistIds.length > 0) { 
             animes = await AnnictRes.find({ //Annictからの情報（画像url等）で構成されたオブジェクトの配列
                 id: { $in: userMylistIds }, // AnnictId が userMylistIds 配列のいずれかに含まれるもの
-                season_name: '2025-winter',
                 media: 'tv'
             })
             .lean()

@@ -9,7 +9,7 @@ const AccessToken = process.env.ACCESS_TOKEN;
 
 
 // MongoDBへの接続
-mongoose.connect('mongodb://localhost:27017/AniHyo', {
+mongoose.connect('mongodb+srv://go0630mameshiba:ZpoFid2BIyhPEahs@cluster0.j1dqg18.mongodb.net/?retryWrites=true&w=majority&appName=Cluster', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -66,7 +66,6 @@ const ResSaveFunc = async (season) => {
     }
 };
 
-ResSaveFunc("2025-spring");
 
 const AnnictKonki = async () => {
     try {

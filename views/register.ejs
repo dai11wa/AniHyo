@@ -1,22 +1,54 @@
 <% layout("layouts/boilerplate") %>
 
 <div class="d-flex justify-content-center align-items-center vh-100">
-    <form class="p-4 border rounded bg-light" style="min-width: 300px;" action="/register" method="POST" class="validated-form" novalidate>
+    <form class="p-4 border rounded bg-light needs-validation" style="min-width: 300px;" action="/register" method="POST" novalidate>
         <h2 class="text-center mb-4">ユーザー登録</h2>
-            <div class="mb-3">
-                <label for="username" class="form-label">ユーザー名</label>
-                <input type="text" class="form-control" id="username" name="username" autofocus required>
+        
+        <div class="mb-3">
+            <label for="username" class="form-label">ユーザー名</label>
+            <input type="text" class="form-control" id="username" name="username" autofocus required>
+            <div class="invalid-feedback">
+                ユーザー名は必須です。
             </div>
+        </div>
 
-            <div class="mb-3">
-                <label for="email" class="form-label">メールアドレス</label>
-                <input type="email" class="form-control" id="email" name="email" required>
+        <div class="mb-3">
+            <label for="email" class="form-label">メールアドレス</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+            <div class="invalid-feedback">
+                有効なメールアドレスを入力してください。
             </div>
+        </div>
 
-            <div class="mb-3">
-                <label for="password" class="form-label">パスワード</label>
-                <input type="password" class="form-control" id="password" name="password" required>
+        <div class="mb-3">
+            <label for="password" class="form-label">パスワード</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+            <div class="invalid-feedback">
+                パスワードは必須です。
             </div>
+        </div>
 
-            <button type="submit" class="btn btn-success w-100">登録する</button>
-        </form>
+        <button type="submit" class="btn btn-success w-100">登録する</button>
+    </form>
+</div>
+
+<script>
+    (function () {
+        'use strict' 
+
+        // 全ての 'needs-validation' クラスを持つフォームを取得
+        var forms = document.querySelectorAll('.needs-validation')
+        //formにイベントを追加
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) { // フォーム全体が有効かチェック
+                        event.preventDefault() // 無効ならデフォルトの送信を停止
+                        event.stopPropagation() // イベント伝播も停止
+                    }
+
+                    form.classList.add('was-validated') // バリデーション状態のCSSクラスを追加
+                }, false) // イベントキャプチャリングではなくバブリングフェーズで処理
+            })
+    })()
+</script>
